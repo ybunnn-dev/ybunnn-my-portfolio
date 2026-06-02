@@ -19,13 +19,24 @@ const LazyAboutMe = dynamic(() => import("./sections/about"), {
   loading: () => <SkeletonLoader className="w-full h-96 mt-20" />
 });
 
-// Added Tech Stack dynamic import
+const LazyExperience = dynamic(() => import("./sections/experience"), {
+  ssr: false,
+  loading: () => <SkeletonLoader className="w-full h-96 mt-20" />
+});
+
 const LazyTechStack = dynamic(() => import("./sections/tech_stack"), {
   ssr: false,
   loading: () => <SkeletonLoader className="w-full h-96 mt-20" />
 });
 
-const LazyExperience = dynamic(() => import("./sections/experience"), {
+// Added Projects dynamic import
+const LazyProjects = dynamic(() => import("./sections/projects"), {
+  ssr: false,
+  loading: () => <SkeletonLoader className="w-full h-96 mt-20" />
+});
+
+// Added Gallery dynamic import
+const LazyGallery = dynamic(() => import("./sections/gallery"), {
   ssr: false,
   loading: () => <SkeletonLoader className="w-full h-96 mt-20" />
 });
@@ -45,7 +56,7 @@ const FadeInSection = ({ children }: { children: ReactNode }) => {
           }
         });
       },
-      { threshold: 0.15 }
+      { threshold: 0.15 } 
     );
 
     const current = domRef.current;
@@ -71,7 +82,9 @@ const FadeInSection = ({ children }: { children: ReactNode }) => {
 
 export default function Home() {
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [activeSection, setActiveSection] = useState("home");
 
+  // Handle Dark Mode Toggle
   useEffect(() => {
     if (isDarkMode) {
       document.documentElement.classList.add("dark");
@@ -80,6 +93,60 @@ export default function Home() {
     }
   }, [isDarkMode]);
 
+  // Handle Active Navigation Link
+  useEffect(() => {
+    const handleScroll = () => {
+      const sections = ["home", "about", "experience", "tech-stack", "projects", "gallery"];
+      
+      // Find the section currently in the viewport
+      const currentSection = sections.find(sectionId => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          // Check if the top of the section is near the top of the viewport
+          return rect.top <= 100 && rect.bottom >= 100;
+        }
+        return false;
+      });
+
+      if (currentSection) {
+        setActiveSection(currentSection);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    // Call once to set initial state
+    handleScroll(); 
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Handle Smooth Scrolling
+  const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, sectionId: string) => {
+    e.preventDefault();
+    const element = document.getElementById(sectionId);
+    if (element) {
+      // Offset by the navbar height (approximately 64px)
+      const offsetTop = element.offsetTop - 64; 
+      window.scrollTo({
+        top: offsetTop,
+        behavior: "smooth"
+      });
+      // Optionally update active section immediately for snappier feedback
+      setActiveSection(sectionId);
+    }
+  };
+
+  const navLinks = [
+    { id: "home", label: "Home" },
+    { id: "about", label: "About" },
+    { id: "experience", label: "Experience" },
+    { id: "tech-stack", label: "Tech Stack" },
+    { id: "projects", label: "Projects" },
+    { id: "gallery", label: "Gallery" },
+  ];
+
+
   return (
     <div className="w-full bg-[#F4F4F4] dark:bg-gray-900 transition-colors duration-300">
       
@@ -87,44 +154,65 @@ export default function Home() {
       <nav className="fixed top-0 left-0 w-full h-16 z-50 bg-white/50 dark:bg-[#1E293B]/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 transition-colors duration-300">
         <div className="max-w-7xl mx-auto h-full px-6 flex items-center justify-between">
           
-          {/* Logo / Name */}
-          <a href="#home" className="text-2xl font-bold text-gray-900 dark:text-white tracking-wide">
+          {/* Logo / Name - Updated to cyan-950 in light mode */}
+          <a 
+            href="#home" 
+            onClick={(e) => scrollToSection(e, "home")}
+            className="text-2xl font-bold text-cyan-950 dark:text-white tracking-wide"
+          >
             Ybunnn
           </a>
 
           {/* Nav Links & Controls */}
-          <div className="flex items-center gap-6 md:gap-10">
-            <div className="hidden md:flex items-center gap-6 text-sm font-semibold text-gray-600 dark:text-gray-300">
-              <a href="#about" className="hover:text-gray-900 dark:hover:text-white transition-colors">About</a>
-              {/* Added Tech Stack link */}
-              <a href="#tech-stack" className="hover:text-gray-900 dark:hover:text-white transition-colors">Tech Stack</a>
-              <a href="#experience" className="hover:text-gray-900 dark:hover:text-white transition-colors">Experience</a>
+          <div className="flex items-center gap-6 md:gap-8">
+            <div className="hidden md:flex items-center gap-6 text-sm font-semibold">
+              {navLinks.map((link) => (
+                <a 
+                  key={link.id}
+                  href={`#${link.id}`} 
+                  onClick={(e) => scrollToSection(e, link.id)}
+                  className={`transition-colors relative py-1 ${
+                    activeSection === link.id 
+                      // Active State: Bright Cyan
+                      ? "text-cyan-600 dark:text-cyan-400" 
+                      // Default State: Deep Cyan (Light Mode) / Light Gray (Dark Mode)
+                      : "text-cyan-900 dark:text-gray-300 hover:text-cyan-700 dark:hover:text-white"
+                  }`}
+                >
+                  {link.label}
+                  {/* Active Indicator Underline */}
+                  {activeSection === link.id && (
+                     <span className="absolute bottom-0 left-0 w-full h-0.5 bg-cyan-600 dark:bg-cyan-400 rounded-full"></span>
+                  )}
+                </a>
+              ))}
             </div>
 
             {/* Interactive Sun/Moon Dark Mode Toggle */}
             <button 
               onClick={() => setIsDarkMode(!isDarkMode)}
-              className={`relative w-14 h-7 flex items-center rounded-full p-1 cursor-pointer transition-colors duration-300 focus:outline-none ${
-                isDarkMode ? "bg-slate-700" : "bg-gray-300"
-              }`}
+              className="p-2 rounded-full text-cyan-900 dark:text-gray-300 hover:bg-cyan-50 dark:hover:bg-slate-700 transition-colors focus:outline-none"
               aria-label="Toggle Dark Mode"
             >
-              {/* Sun Icon */}
-              <svg className="absolute left-1.5 w-3.5 h-3.5 text-gray-100" viewBox="0 0 64 64" fill="currentColor">
-                 <circle cx="32.003" cy="32.005" r="16.001"></circle>
-              </svg>
-              
-              {/* Moon Icon */}
-              <svg className="absolute right-1.5 w-3.5 h-3.5 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
-              </svg>
-
-              {/* Sliding Thumb */}
-              <div 
-                className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 z-10 ${
-                  isDarkMode ? "translate-x-7" : "translate-x-0"
-                }`}
-              ></div>
+              {!isDarkMode ? (
+                // Sun Icon (Visible in Light Mode)
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="5"></circle>
+                  <line x1="12" y1="1" x2="12" y2="3"></line>
+                  <line x1="12" y1="21" x2="12" y2="23"></line>
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                  <line x1="1" y1="12" x2="3" y2="12"></line>
+                  <line x1="21" y1="12" x2="23" y2="12"></line>
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+              ) : (
+                // Moon Icon (Visible in Dark Mode)
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+              )}
             </button>
           </div>
         </div>
@@ -134,7 +222,7 @@ export default function Home() {
       <main className="w-full flex flex-col items-center">
         
         {/* Profile / Hero Section */}
-        <div className="w-full">
+        <div id="home" className="w-full">
           <LazyProfileSec />
         </div>
 
@@ -145,7 +233,7 @@ export default function Home() {
           </FadeInSection>
         </section>
         
-        {/* Experience Section (Full Width, No FadeInSection Wrapper) */}
+        {/* Experience Section */}
         <section id="experience" className="w-full min-h-[80vh]">
           <LazyExperience />
         </section>
@@ -156,6 +244,21 @@ export default function Home() {
             <LazyTechStack />
           </FadeInSection>
         </section>
+            
+        {/* Projects Section 
+        <section id="projects" className="w-full min-h-[80vh] flex items-center py-24 px-6 md:px-12 max-w-7xl mx-auto">
+          <FadeInSection>
+            <LazyProjects />
+          </FadeInSection>
+        </section>
+
+     
+        <section id="gallery" className="w-full min-h-[80vh] flex items-center py-24 px-6 md:px-12 max-w-7xl mx-auto">
+          <FadeInSection>
+            <LazyGallery />
+          </FadeInSection>
+        </section>
+        */}
       </main>
     </div>
   );
