@@ -155,12 +155,12 @@ export default function Home() {
         <div className="max-w-7xl mx-auto h-full px-6 flex items-center justify-between">
           
           {/* Logo / Name - Updated to cyan-950 in light mode */}
-          <a 
-            href="#home" 
+          <a
+            href="#home"
             onClick={(e) => scrollToSection(e, "home")}
             className="text-2xl font-bold text-cyan-950 dark:text-white tracking-wide"
           >
-            John Ivan B. Belaro
+            {"<ybunnn-dev />"}
           </a>
 
           {/* Nav Links & Controls */}
