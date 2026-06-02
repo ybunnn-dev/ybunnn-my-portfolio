@@ -3,7 +3,11 @@
 import React, { useState, useEffect, useRef } from "react";
 
 const timeline = [
-  { year: "2026", title: "IT Intern", desc: "Currently an Intern at DOST-V" },
+  {
+    year: "2026",
+    title: "DOST Region V Internship",
+    desc: "Contributed to DOCS 2.0 as an Assistant Full-Stack Developer and UI/UX Designer."
+  },
   { year: "2025", title: "Lead Developer", desc: "Led Capstone Project such as Integrated Barangay Healthcare Management System as well as projects such as Hotel Management System." },
   { year: "2024", title: "First Backend Experience", desc: "Collaborated in building web applications such as Inventory Management System and E-Commerce Website" },
   { year: "2023", title: "2nd Year College - Academic Projects", desc: "Collaborated on various university-level software engineering projects such as Java and Web Development." },

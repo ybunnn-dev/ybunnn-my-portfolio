@@ -160,7 +160,7 @@ export default function Home() {
             onClick={(e) => scrollToSection(e, "home")}
             className="text-2xl font-bold text-cyan-950 dark:text-white tracking-wide"
           >
-            Ybunnn
+            John Ivan B. Belaro
           </a>
 
           {/* Nav Links & Controls */}
