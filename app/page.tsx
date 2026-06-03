@@ -245,14 +245,12 @@ export default function Home() {
           </FadeInSection>
         </section>
             
-        {/* Projects Section 
-        <section id="projects" className="w-full min-h-[80vh] flex items-center py-24 px-6 md:px-12 max-w-7xl mx-auto">
-          <FadeInSection>
-            <LazyProjects />
-          </FadeInSection>
+        
+        <section id="projects" className="w-full min-h-[80vh]">
+          <LazyProjects />
         </section>
 
-     
+      {/* GalerySection
         <section id="gallery" className="w-full min-h-[80vh] flex items-center py-24 px-6 md:px-12 max-w-7xl mx-auto">
           <FadeInSection>
             <LazyGallery />
